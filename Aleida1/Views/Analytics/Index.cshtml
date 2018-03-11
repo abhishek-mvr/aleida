@@ -10,8 +10,8 @@
     <h1>
         Hourly Network Activity
     </h1>
-<!--    
--->
+    <!--
+    -->
     <canvas id="bar-chart" width="800" height="280"></canvas>
     <br /><br /><br /><br /><br /><br />
 
@@ -56,7 +56,7 @@
         @foreach (var item in Model)
         {
 
-            @if (item.Affected==1)
+            @if (item.Affected == 1)
             {
                 affected = true;
             }
@@ -65,32 +65,32 @@
                 affected = false;
             }
             <tbody>
-                    @if (affected)
-                    {
+                @if (affected)
+                {
                     <tr class="table-warning">
-                            <td>@i</td>
-                            @{ i = i + 1;}
-                            <td>@Html.DisplayFor(modelItem => item.Name)</td>
-                            <td>@Html.DisplayFor(modelItem => item.IpAddress)</td>
-                            <td>
-                                @Html.ActionLink("Affected", "Details", "Home", new { id = item.Id })
-                            </td>
-                    </tr>
-                    }
-                    else
-                    {
-                    <tr class="table-success">
                         <td>@i</td>
                         @{ i = i + 1;}
                         <td>@Html.DisplayFor(modelItem => item.Name)</td>
                         <td>@Html.DisplayFor(modelItem => item.IpAddress)</td>
                         <td>
-                            @Html.ActionLink("Normal", "Details", "Home", new { id = item.Id })
+                            @Html.ActionLink("Affected", "Details", "Home", new { id = item.Id })
                         </td>
                     </tr>
-                    }
-        </tbody>
-        }
+                            }
+                            else
+                            {
+                                <tr class="table-success">
+                                    <td>@i</td>
+                                    @{ i = i + 1;}
+                                    <td>@Html.DisplayFor(modelItem => item.Name)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.IpAddress)</td>
+                                    <td>
+                                        @Html.ActionLink("Normal", "Details", "Home", new { id = item.Id })
+                                    </td>
+                                </tr>
+                                        }
+            </tbody>
+                                        }
     </table>
 
 </div>

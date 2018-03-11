@@ -11,8 +11,6 @@ namespace Aleida1.Controllers
 {
     public class HomeController : Controller
     {
-        private DataServerContext ds = new DataServerContext();
-
         public IActionResult Index()
         {
             return View();
@@ -30,18 +28,6 @@ namespace Aleida1.Controllers
             ViewData["Message"] = "Your contact page.";
 
             return View();
-        }
-
-      //  [Authorize]
-        public IActionResult Analytics()
-        {
-            return View(ds.Pcdetails.ToList());
-        }
-
-        public IActionResult Details(int id = 1)
-        {
-            Pcdetails pc = ds.Pcdetails.Find(id);
-            return View(pc);
         }
 
         public IActionResult Help()
