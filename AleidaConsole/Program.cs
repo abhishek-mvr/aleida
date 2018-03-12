@@ -9,10 +9,64 @@ using System.IO;
 namespace AleidaConsole
 {
 
+
+    //Class for each ip connections
+    public class Connection
+    {
+        public String lanip;
+        public String swanip;
+        public Connection(String lanip, String swanip)
+        {
+            this.lanip = lanip;
+            this.swanip = swanip;
+        }
+            
+        public override string ToString()
+        {
+            return lanip + " " + swanip;
+        }
+
+    }
+
+    //Class for info on each connections
+    public class ConnectionInfo
+    {
+        public int start;
+        public int end;
+        public int[] acthours = new int[24];
+        public ConnectionInfo()
+        { }
+    }
+
+
+
     static class Program
     {
+
+        //Dictionary for all connection_info
+        static Dictionary<Connection, ConnectionInfo> Connections;
+
+        class DPLayerItem
+        {
+            public Connection con { get; set; }
+
+            public DPLayerItem(Connection con)
+            {
+                this.con =con;
+            }
+            public float ActHour()
+            {
+                var xconn = from conn in Connections where conn.Key.ToString() == con.lanip select conn;
+                return xconn.Max(x=>x.Value.acthours.Sum());
+            }
+                //, ActRate, ActWeight, FailHour, FailRate, FailWeight, FailFlow, FailMatch, NoExist, DPortSum;
+
+        }
+
         static void Main()
         {
+            DPLayerItem dPLayerItem;
+            Connections = new Dictionary<Connection, ConnectionInfo>();
             Console.Write("Starting Aleida\n");
             using (var progress = new ProgressBar())
             { 
@@ -23,72 +77,48 @@ namespace AleidaConsole
                 }
             }
             Console.WriteLine("Done.");
+            Console.WriteLine("Reading RawData....");
+            Thread.Sleep(1000);
             ReadRawData();
-        }
+            Console.WriteLine("Done.");
+            Console.WriteLine("Processing LanIP Layer.....");
+            Thread.Sleep(1000);
 
-    //Check whether the ip is suspected or not from SuspectedIPs.csv file
-    private static bool IsSuspected(String ip)
-    {
-        if (ip == null)
-        {
-            throw new ArgumentNullException(nameof(ip));
-        }
-        var lines = System.IO.File.ReadLines("SuspectedIPs.csv");
-        foreach (var line in lines)
-        {
-            if (line.Equals(ip))
+            foreach(var item in Connections)
             {
-                return true;
-            }
-        }
-        return false;
-    }
-
-        //Class for each ip connections
-        private class Connection
-        {
-            public String lanip;
-            public String swanip;
-            public Connection(String lanip, String swanip)
-            {
-                this.lanip = lanip;
-                this.swanip = swanip;
-            }
-            
-            public override string ToString()
-            {
-                return lanip;
+                dPLayerItem = new DPLayerItem(item.Key);
+                Console.WriteLine(dPLayerItem.con.lanip + " => " + dPLayerItem.con.swanip + " | " + dPLayerItem.ActHour());
             }
 
+            Console.WriteLine("Done.");
+
         }
 
-        //Class for info on each connections
-        private class ConnectionInfo
+        //Check whether the ip is suspected or not from SuspectedIPs.csv file
+        private static bool IsSuspected(String ip)
         {
-            public int start;
-            public int end;
-            public int[] acthours = new int[24];
-            public ConnectionInfo()
-            { }
-        }
-
-        //Dictionary for all connection_info
-        static Dictionary<Connection, ConnectionInfo> Connections;
-        static Dictionary<Connection, ConnectionInfo> temp;
-
-
-        class DPLayer
-        {
-            Connection con { get; set; }
-            public float ActHour()
+            IEnumerable<string> lines;
+            if (ip == null)
             {
-                var xconn = from conn in Connections where conn.Key.ToString() == con.lanip select conn;
-                return xconn.Max(x=>x.Value.acthours.Sum());
+                throw new ArgumentNullException(nameof(ip));
             }
-                //, ActRate, ActWeight, FailHour, FailRate, FailWeight, FailFlow, FailMatch, NoExist, DPortSum;
-
+            try
+            {
+                lines = File.ReadLines("ClearIPs.csv");
+                foreach (var line in lines)
+                {
+                    if (line.Equals(ip))
+                    {
+                        return false;
+                    }
+                }
+            }
+            catch(IOException)
+            {
+                Console.WriteLine("The process cannot access the file 'ClearIPs.csv' because its being used by another process");
+            }
+        return true;
         }
-
 
 
         private static void ReadRawData()
@@ -104,19 +134,24 @@ namespace AleidaConsole
             //    token = Regex.Split(line, pattern);
             //    Console.WriteLine(token[0] + " : " + " source : " + token[0] + " dest : " + token[0] + "\n");
 
-            StreamReader readFile = new StreamReader("RawData.cs");
+            StreamReader readFile = new StreamReader("RawData.csv");
             string line;
             string[] row;
-            var tokens;
-            readFile.ReadLine();
             while ((line = readFile.ReadLine()) != null)
             {
                 row = line.Split(',');
-            }
-                hour = token[0]);
-                key = new Connection(token[1], token[2]);
-                if (Connections.TryGetValue(key, out value))
+                hour = Convert.ToInt32(row[0]);
+                key = new Connection(row[1], row[2]);
+                
+                Console.Write(line);
+                if (IsSuspected(row[2]))
+                    Console.Write(" | Suspected IP\n");
+                else
+                    Console.Write("\n");
+
+                if (Connections.TryGetValue(key,out value))
                 {
+                    Console.Write("Match found");
                     value.acthours[hour]++;
                     if (value.start < hour)
                     {
@@ -134,12 +169,11 @@ namespace AleidaConsole
                     value.start = hour;
                     value.end = hour;
                     value.acthours[hour]++;
-                    Connections.Add(key, value);
+                    Connections.TryAdd(key, value);
                 }
             }
         readFile.Close();
-
-
+        }
     }
 
 }
