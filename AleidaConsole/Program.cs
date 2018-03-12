@@ -44,8 +44,13 @@ namespace AleidaConsole
     {
 
         //Dictionary for all connection_info
-        static Dictionary<Connection, ConnectionInfo> Connections;
+        static Dictionary<string, ConnectionInfo> Connections;
 
+        public static String[] extractIP(string con)
+        {
+            string[] res = con.Split(',');
+            return res;
+        }
         class DPLayerItem
         {
             public Connection con { get; set; }
@@ -56,17 +61,26 @@ namespace AleidaConsole
             }
             public float ActHour()
             {
-                var xconn = from conn in Connections where conn.Key.ToString() == con.lanip select conn;
+                var xconn = from conn in Connections where extractIP(conn.Key)[0] == con.lanip select conn;
                 return xconn.Max(x=>x.Value.acthours.Sum());
             }
                 //, ActRate, ActWeight, FailHour, FailRate, FailWeight, FailFlow, FailMatch, NoExist, DPortSum;
 
         }
 
+        static void PrintCollections()
+        {
+            Console.WriteLine("Printing complete connections...");
+            foreach(var item in Connections)
+            {
+                Console.WriteLine(item.Key);
+            }
+        }
+
         static void Main()
         {
-            DPLayerItem dPLayerItem;
-            Connections = new Dictionary<Connection, ConnectionInfo>();
+//          DPLayerItem dPLayerItem;
+            Connections = new Dictionary<string, ConnectionInfo>();
             Console.Write("Starting Aleida\n");
             using (var progress = new ProgressBar())
             { 
@@ -84,11 +98,12 @@ namespace AleidaConsole
             Console.WriteLine("Processing LanIP Layer.....");
             Thread.Sleep(1000);
 
-            foreach(var item in Connections)
-            {
-                dPLayerItem = new DPLayerItem(item.Key);
-                Console.WriteLine(dPLayerItem.con.lanip + " => " + dPLayerItem.con.swanip + " | " + dPLayerItem.ActHour());
-            }
+            PrintCollections();
+            //foreach(var item in Connections)
+            //{
+            //    dPLayerItem = new DPLayerItem(item.Key);
+            //    Console.WriteLine(dPLayerItem.con.lanip + " => " + dPLayerItem.con.swanip + " | " + dPLayerItem.ActHour());
+            //}
 
             Console.WriteLine("Done.");
 
@@ -123,7 +138,8 @@ namespace AleidaConsole
 
         private static void ReadRawData()
         {
-            Connection key;
+//            Connection ikey;
+            string key;
             ConnectionInfo value;
             int hour;
             //String pattern = "s*,s*,s*,s*,s*";
@@ -141,17 +157,19 @@ namespace AleidaConsole
             {
                 row = line.Split(',');
                 hour = Convert.ToInt32(row[0]);
-                key = new Connection(row[1], row[2]);
-                
-                Console.Write(line);
-                if (IsSuspected(row[2]))
-                    Console.Write(" | Suspected IP\n");
-                else
-                    Console.Write("\n");
 
-                if (Connections.TryGetValue(key,out value))
+                //ikey = new Connection(row[1], row[2]);
+
+                key = row[1] + "," + row[2];
+                if (IsSuspected(row[2]))
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
+                else
+                    Console.ForegroundColor = ConsoleColor.White;
+                Console.WriteLine(line);
+
+                if (Connections.ContainsKey(key))
                 {
-                    Console.Write("Match found");
+                    value = Connections[key];
                     value.acthours[hour]++;
                     if (value.start < hour)
                     {
@@ -169,10 +187,12 @@ namespace AleidaConsole
                     value.start = hour;
                     value.end = hour;
                     value.acthours[hour]++;
-                    Connections.TryAdd(key, value);
+                    Connections.Add(key, value);
                 }
             }
         readFile.Close();
+        Console.ForegroundColor = ConsoleColor.White;
+
         }
     }
 
