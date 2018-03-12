@@ -28,6 +28,7 @@ namespace AleidaConsole
 
     }
 
+
     //Class for info on each connections
     public class ConnectionInfo
     {
@@ -42,7 +43,6 @@ namespace AleidaConsole
 
     static class Program
     {
-
         //Dictionary for all connection_info
         static Dictionary<string, ConnectionInfo> Connections;
 
@@ -53,15 +53,12 @@ namespace AleidaConsole
         }
         class DPLayerItem
         {
-            public Connection con { get; set; }
-
-            public DPLayerItem(Connection con)
+            public string connection, lanip;
+            public float ActHour(string iconnection)
             {
-                this.con =con;
-            }
-            public float ActHour()
-            {
-                var xconn = from conn in Connections where extractIP(conn.Key)[0] == con.lanip select conn;
+                connection = iconnection;
+                lanip = extractIP(connection)[0];
+                var xconn = from conn in Connections where extractIP(conn.Key)[0] == lanip select conn;
                 return xconn.Max(x=>x.Value.acthours.Sum());
             }
                 //, ActRate, ActWeight, FailHour, FailRate, FailWeight, FailFlow, FailMatch, NoExist, DPortSum;
@@ -70,10 +67,11 @@ namespace AleidaConsole
 
         static void PrintCollections()
         {
+            DPLayerItem dPItem = new DPLayerItem();
             Console.WriteLine("Printing complete connections...");
             foreach(var item in Connections)
             {
-                Console.WriteLine(item.Key);
+                Console.WriteLine(item.Key + " : "+dPItem.ActHour(item.Key));
             }
         }
 
