@@ -73,7 +73,7 @@
                         <td>@Html.DisplayFor(modelItem => item.Name)</td>
                         <td>@Html.DisplayFor(modelItem => item.IpAddress)</td>
                         <td>
-                            @Html.ActionLink("Affected", "Details", "Home", new { id = item.Id })
+                            @Html.ActionLink("Affected", "Details", "Analytics", new { id = item.Id })
                         </td>
                     </tr>
                             }
@@ -85,7 +85,7 @@
                                     <td>@Html.DisplayFor(modelItem => item.Name)</td>
                                     <td>@Html.DisplayFor(modelItem => item.IpAddress)</td>
                                     <td>
-                                        @Html.ActionLink("Normal", "Details", "Home", new { id = item.Id })
+                                        @Html.ActionLink("Normal", "Details", "Analytics", new { id = item.Id })
                                     </td>
                                 </tr>
                                         }

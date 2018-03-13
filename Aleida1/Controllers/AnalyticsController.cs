@@ -71,13 +71,14 @@ namespace Aleida1.Controllers
 
         }
 
-        //[Authorize]
+        [Authorize]
         public IActionResult Index()
         {
             Console.WriteLine("Index method in Analytics");
             return View(ds.Pcdetails.ToList());
         }
 
+        [Authorize]
         public IActionResult Details(int id = 1)
         {
             Pcdetails pc = ds.Pcdetails.Find(id);
