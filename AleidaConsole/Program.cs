@@ -46,7 +46,7 @@ namespace AleidaConsole
         //Dictionary for all connection_info
         static Dictionary<string, ConnectionInfo> Connections;
 
-        public static String[] extractIP(string con)
+        public static String[] ExtractIP(string con)
         {
             string[] res = con.Split(',');
             return res;
@@ -57,8 +57,8 @@ namespace AleidaConsole
             public float ActHour(string iconnection)
             {
                 connection = iconnection;
-                lanip = extractIP(connection)[0];
-                var xconn = from conn in Connections where extractIP(conn.Key)[0] == lanip select conn;
+                lanip = ExtractIP(connection)[0];
+                var xconn = from conn in Connections where ExtractIP(conn.Key)[0] == lanip select conn;
                 return xconn.Max(x=>x.Value.acthours.Sum());
             }
                 //, ActRate, ActWeight, FailHour, FailRate, FailWeight, FailFlow, FailMatch, NoExist, DPortSum;
@@ -181,9 +181,11 @@ namespace AleidaConsole
                 }
                 else
                 {
-                    value = new ConnectionInfo();
-                    value.start = hour;
-                    value.end = hour;
+                    value = new ConnectionInfo
+                    {
+                        start = hour,
+                        end = hour
+                    };
                     value.acthours[hour]++;
                     Connections.Add(key, value);
                 }
