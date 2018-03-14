@@ -165,6 +165,8 @@ namespace Aleida1.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.Property<string>("Name");
+
                     b.HasIndex("NormalizedEmail")
                         .HasName("EmailIndex");
 
