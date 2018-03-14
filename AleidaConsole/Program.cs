@@ -11,30 +11,30 @@ namespace AleidaConsole
 
 
     //Class for each ip connections
-    public class Connection
-    {
-        public String lanip;
-        public String swanip;
-        public Connection(String lanip, String swanip)
-        {
-            this.lanip = lanip;
-            this.swanip = swanip;
-        }
+    //public class Connection
+    //{
+    //    public String lanip;
+    //    public String swanip;
+    //    public Connection(String lanip, String swanip)
+    //    {
+    //        this.lanip = lanip;
+    //        this.swanip = swanip;
+    //    }
             
-        public override string ToString()
-        {
-            return lanip + " " + swanip;
-        }
+    //    public override string ToString()
+    //    {
+    //        return lanip + " " + swanip;
+    //    }
 
-    }
+    //}
 
 
     //Class for info on each connections
     public class ConnectionInfo
     {
         public int start;
-        public int end;
-        public int[] acthours = new int[24];
+        public int port;
+        public bool failure; 
         public ConnectionInfo()
         { }
     }
@@ -44,7 +44,7 @@ namespace AleidaConsole
     static class Program
     {
         //Dictionary for all connection_info
-        static Dictionary<string, ConnectionInfo> Connections;
+        static Dictionary<string, List<ConnectionInfo>> Connections;
 
         public static String[] ExtractIP(string con)
         {
@@ -54,31 +54,30 @@ namespace AleidaConsole
         class DPLayerItem
         {
             public string connection, lanip;
-            public float ActHour(string iconnection)
-            {
-                connection = iconnection;
-                lanip = ExtractIP(connection)[0];
-                var xconn = from conn in Connections where ExtractIP(conn.Key)[0] == lanip select conn;
-                return xconn.Max(x=>x.Value.acthours.Sum());
-            }
+            //public float ActHour(string iconnection)
+            //{
+            //    connection = iconnection;
+            //    lanip = ExtractIP(connection)[0];
+            //    var xconn = from conn in Connections where ExtractIP(conn.Key)[0] == lanip select conn;
+            //    return xconn.Max(x=>x.Value.acthours.Sum());
+            //}
                 //, ActRate, ActWeight, FailHour, FailRate, FailWeight, FailFlow, FailMatch, NoExist, DPortSum;
 
         }
 
         static void PrintCollections()
         {
-            DPLayerItem dPItem = new DPLayerItem();
             Console.WriteLine("Printing complete connections...");
             foreach(var item in Connections)
             {
-                Console.WriteLine(item.Key + " : "+dPItem.ActHour(item.Key));
+                Console.WriteLine(item.Key + " : ");
             }
         }
 
         static void Main()
         {
 //          DPLayerItem dPLayerItem;
-            Connections = new Dictionary<string, ConnectionInfo>();
+            Connections = new Dictionary<string, List<ConnectionInfo>>();
             Console.Write("Starting Aleida\n");
             using (var progress = new ProgressBar())
             { 
@@ -138,7 +137,7 @@ namespace AleidaConsole
         {
 //            Connection ikey;
             string key;
-            ConnectionInfo value;
+            List<ConnectionInfo> value;
             int hour;
             //String pattern = "s*,s*,s*,s*,s*";
             //String[] token = new String[5];
@@ -167,26 +166,22 @@ namespace AleidaConsole
 
                 if (Connections.ContainsKey(key))
                 {
-                    value = Connections[key];
-                    value.acthours[hour]++;
-                    if (value.start < hour)
+                    Connections[key].Add(new ConnectionInfo
                     {
-                        value.start = hour;   
-                    }
-                    if(value.end > hour)
-                    {
-                        value.end = hour;
-                    }
-                    Connections[key] = value;
+                        start = Convert.ToInt32(row[0]),
+                        port = Convert.ToInt32(row[3]),
+                        failure = Convert.ToBoolean(row[4])
+                    });
                 }
                 else
                 {
-                    value = new ConnectionInfo
+                    value = new List<ConnectionInfo>();
+                    value.Add(new ConnectionInfo
                     {
-                        start = hour,
-                        end = hour
-                    };
-                    value.acthours[hour]++;
+                        start = Convert.ToInt32(row[0]),
+                        port = Convert.ToInt32(row[3]),
+                        failure = Convert.ToBoolean(row[4])
+                    });
                     Connections.Add(key, value);
                 }
             }
