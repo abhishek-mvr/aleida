@@ -170,7 +170,7 @@ namespace AleidaConsole
                     {
                         start = Convert.ToInt32(row[0]),
                         port = Convert.ToInt32(row[3]),
-                        failure = Convert.ToBoolean(row[4])
+                        failure = Convert.ToBoolean(Convert.ToInt32(row[4]))
                     });
                 }
                 else
@@ -180,7 +180,7 @@ namespace AleidaConsole
                     {
                         start = Convert.ToInt32(row[0]),
                         port = Convert.ToInt32(row[3]),
-                        failure = Convert.ToBoolean(row[4])
+                        failure = Convert.ToBoolean(Convert.ToInt32(row[4]))
                     });
                     Connections.Add(key, value);
                 }
