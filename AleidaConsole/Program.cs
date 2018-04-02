@@ -11,7 +11,7 @@ namespace AleidaConsole
     
     public static class Connections
     {
-        public static List<Connection> list;
+        public static List<Connection> list=new List<Connection>();
 
         public static bool ContainsConn(string lanip, string wanip)
         {
@@ -31,9 +31,12 @@ namespace AleidaConsole
         public int End { get; set; }
         public bool Failure { get; set; }
         public int[] ActHours = new int[24];
-        public List<int> Ports;
+        public List<int> Ports= new List<int>();
         public Connection(string lanip, string wanip, int time, int port , bool failure)
         {
+            LanIP ip = new LanIP(lanip);
+            if (!LanIPs.list.Contains(ip))
+                 LanIPs.list.Add(ip);
             this.LanIp = lanip;
             this.WanIp = wanip;
             this.Start = time;
@@ -57,13 +60,25 @@ namespace AleidaConsole
 
     }
 
+    public static class LanIPs
+    {
+        public static List<LanIP> list = new List<LanIP>();
+    }
 
     public class LanIP
     {
-        string ip;
+        int[] ah;
+        List<int> ActiveHours = new List<int>();
+        List<float> ar = new List<float>();
+        public string ip;
         int end;
         int start;
         int Null;
+
+        public LanIP(string ip)
+        {
+            this.ip = ip;
+        }
 
         public float ActHour
         {
@@ -80,50 +95,45 @@ namespace AleidaConsole
             get
             {
                 int t = 0;
-                int[] ah = new int[24];
-                List<float> ar = new List<float>();
-                var iend = from conn in Connections.list where conn.LanIp == ip select conn.End;
+                var jconn = from conn in Connections.list where conn.LanIp == ip select conn;
+                var istart = jconn.Select(x => x.Start);
+                var iend = jconn.Select(x => x.End);
+                var ilist = jconn.Select(x => x.ActHours);
                 end = iend.Max();
-                var istart = from conn in Connections.list where conn.LanIp == ip select conn.Start;
                 start = istart.Min();
-                var ilist = from conn in Connections.list where conn.LanIp == ip select conn.ActHours;
+                var jStart = jconn.GroupBy(y => y.WanIp).Select(g => g.Min(b=>b.Start));
                 Null = 0;
                 int[] arr = Enumerable.Repeat(1, 24).ToArray();
-                foreach(var conn in ilist)
+                ActiveHours = new List<int>();
+                foreach (var conn in ilist)
                 {
+                    ah = new int[24];
                     int i = start;
-                    t = 0;
                     while(i<end)
                     {
                         if(conn[i]!=0)
                         {
-                            ah[t]++;
-                            if(arr[i]!=0)
-                            {
-                                arr[i] = 0;
-                            }
+                            ah[i]=1;
+                            arr[i] = 0;
                         }
                         i++;
                     }
-                    t++;
+                    ActiveHours.Add(ah.Sum());
                 }
                 Null = arr.Sum();
                 t = 0;
-                foreach(var start in istart)
+                foreach(var start in jStart)
                 {
-                    ar[t] = ah[t] / (((end - start) + 1) - Null);
+                    try
+                    {
+                    ar.Add(ActiveHours[t] / (((end - start) + 1) - Null));
+                    }
+                    catch(DivideByZeroException)
+                    {}
+                    t++;
                 }
                 return ar.Min();
             }
-        }
-
-        public float ActWeight
-        {
-            get
-            {
-
-            }
-
         }
     }
 
@@ -132,33 +142,20 @@ namespace AleidaConsole
         {
         //Dictionary for all connection_info
 
-        class DPLayerItem
-        {
-            public string connection, lanip;
-            public float ActHour(string iconnection)
-            {
-                connection = iconnection;
-                lanip = ExtractIP(connection)[0];
-                var xconn = from conn in Connections where ExtractIP(conn.Key)[0] == lanip select conn;
-                return xconn.Max(x=>x.Value.acthours.Sum());
-            }
-                //, ActRate, ActWeight, FailHour, FailRate, FailWeight, FailFlow, FailMatch, NoExist, DPortSum;
-
-        }
-
         static void PrintCollections()
         {
-            DPLayerItem dPItem = new DPLayerItem();
             Console.WriteLine("Printing complete connections...");
-            foreach(var item in Connections)
+            foreach(var item in LanIPs.list)
             {
-                Console.WriteLine(item.Key + " : "+dPItem.ActHour(item.Key));
+                Console.WriteLine(item.ip + " : "+item.ActRate + " : " +item.ActHour);
             }
+            var x = LanIPs.list;
+            Console.WriteLine("Process Completed..");
+
         }
 
         static void Main()
         {
-//          DPLayerItem dPLayerItem;
             Console.Write("Starting Aleida\n");
             using (var progress = new ProgressBar())
             { 
@@ -206,14 +203,20 @@ namespace AleidaConsole
                     Console.ForegroundColor = ConsoleColor.White;
                 Console.WriteLine(line);
 
-                var item = from i in connections.list where i.LanIp==row[1] && i.WanIp==row[2] select i ;
-                if(item!=null)
+                try
                 {
-                    item.ToList()[0].AddConn(Convert.ToInt32(row[0]), Convert.ToInt32(row[3]));
+                    var item = from i in Connections.list where i.LanIp == row[1] && i.WanIp == row[2] select i;
+                    item = item.ToList();
+                    if(item.Count()<=0)
+                    {
+                        Connections.list.Add(new Connection(row[1], row[2], Convert.ToInt32(row[0]), Convert.ToInt32(row[3]), Convert.ToBoolean(Convert.ToInt32(row[4]))));
+                    }
+                    else
+                    {
+                        item.First().AddConn(Convert.ToInt32(row[0]), Convert.ToInt32(row[3]));
+                    }
                 }
-                else
-                {
-                    connections.list.Add(new Connection(row[1], row[2], Convert.ToInt32(row[0]), Convert.ToInt32(row[3]), Convert.ToBoolean(row[4])));
+                catch (ArgumentNullException) {
                 }
             }
 
