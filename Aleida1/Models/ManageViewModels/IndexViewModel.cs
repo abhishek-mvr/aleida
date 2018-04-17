@@ -10,6 +10,8 @@ namespace Aleida1.Models.ManageViewModels
     {
         public string Username { get; set; }
 
+        public string Name { get; set; }
+
         public bool IsEmailConfirmed { get; set; }
 
         [Required]

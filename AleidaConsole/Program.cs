@@ -9,10 +9,10 @@ using System.Data.SqlClient;
 
 namespace AleidaConsole
 {
-    
+
     public static class Connections
     {
-        public static List<Connection> list=new List<Connection>();
+        public static List<Connection> list = new List<Connection>();
 
         public static bool ContainsConn(string lanip, string wanip)
         {
@@ -33,8 +33,8 @@ namespace AleidaConsole
         public int End { get; set; }
         public bool Failure { get; set; }
         public int[] ActHours = new int[24];
-        public List<int> Ports= new List<int>();
-        public Connection(string lanip, string wanip, int time, int port , bool failure,BehaviourLayer behaviour)
+        public List<int> Ports = new List<int>();
+        public Connection(string lanip, string wanip, int time, int port, bool failure, BehaviourLayer behaviour)
         {
             this.behaviour = behaviour;
             LanIP ip = new LanIP(lanip);
@@ -48,7 +48,7 @@ namespace AleidaConsole
             this.ActHours[time] = 1;
             Ports.Add(port);
 
-    }
+        }
 
         public void AddConn(int time, int port)
         {
@@ -69,7 +69,7 @@ namespace AleidaConsole
         public string csv;
         public void WriteCSV()
         {
-            csv= String.Join("\n", list.Select(x => x.ToString()).ToArray());
+            csv = String.Join("\n", list.Select(x => x.ToString()).ToArray());
             Console.Write(csv);
             System.IO.File.WriteAllText(@"behaviour.csv", csv);
 
@@ -102,7 +102,7 @@ namespace AleidaConsole
             get
             {
                 var x = from conn in Connections.list where conn.LanIp == ip select conn.ActHours.Sum();
-                float y = x.Max();  
+                float y = x.Max();
                 return y;
             }
         }
@@ -220,7 +220,7 @@ namespace AleidaConsole
         {
             get
             {
-                ActB = random.Next(0,1000);
+                ActB = random.Next(0, 1000);
                 return ActB;
             }
         }
@@ -229,7 +229,7 @@ namespace AleidaConsole
         {
             get
             {
-                FailB = random.Next(0,1000);
+                FailB = random.Next(0, 1000);
                 return FailB;
             }
         }
@@ -238,7 +238,7 @@ namespace AleidaConsole
         {
             get
             {
-                ScanB = random.Next(0,1000);
+                ScanB = random.Next(0, 1000);
                 return ScanB;
             }
         }
@@ -246,7 +246,7 @@ namespace AleidaConsole
 
 
     static class Program
-        {
+    {
         public static int[] ActivityHours = new int[24];
         public static BehaviourLayer behaviour;
         //Dictionary for all connection_info
@@ -254,9 +254,9 @@ namespace AleidaConsole
         static void PrintCollections()
         {
             Console.WriteLine("Printing complete connections...");
-            foreach(var item in behaviour.list)
+            foreach (var item in behaviour.list)
             {
-                Console.WriteLine(item.ip + " : "+item.ActRate + " : " + item.ActHour + " : " + item.ActWeight + " : " + item.FailRate + " : " + item.FailMatch + " : " + item.FailHour + " : " + item.FailFlow);
+                Console.WriteLine(item.ip + " : " + item.ActRate + " : " + item.ActHour + " : " + item.ActWeight + " : " + item.FailRate + " : " + item.FailMatch + " : " + item.FailHour + " : " + item.FailFlow);
             }
             var x = behaviour.list;
             Console.WriteLine("Process Completed..");
@@ -268,7 +268,7 @@ namespace AleidaConsole
             behaviour = new BehaviourLayer();
             Console.Write("Starting Aleida\n");
             using (var progress = new ProgressBar())
-            { 
+            {
                 for (int i = 0; i <= 100; i++)
                 {
                     progress.Report((double)i / 100);
@@ -291,10 +291,10 @@ namespace AleidaConsole
             //}
             behaviour.WriteCSV();
             KMeans kmeans = new KMeans();
-            Console.WriteLine("No of elements to cluster"+ behaviour.list.Count());
-            foreach(var x in behaviour.list)
+            Console.WriteLine("No of elements to cluster" + behaviour.list.Count());
+            foreach (var x in behaviour.list)
             {
-                Console.WriteLine("item : "+x.ActBehaviour + " " + x.FailBehaviour + " " + x.ScanBehaviour);
+                Console.WriteLine("item : " + x.ActBehaviour + " " + x.FailBehaviour + " " + x.ScanBehaviour);
             }
             kmeans.ClusterData(behaviour.list);
 
@@ -302,9 +302,9 @@ namespace AleidaConsole
             {
                 conn.ConnectionString = "Data Source=(localdb)\\ProjectsV13;Initial Catalog=DataServer;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
                 conn.Open();
-                for(int i =0;i<24;i++)
+                for (int i = 0; i < 24; i++)
                 {
-                    string cmd = "update Activity set activity="+ ActivityHours[i] + " where hour="+i;
+                    string cmd = "update Activity set activity=" + ActivityHours[i] + " where hour=" + i;
                     SqlCommand command = new SqlCommand(cmd, conn);
 
                     Console.WriteLine(cmd);
@@ -355,21 +355,22 @@ namespace AleidaConsole
                 {
                     var item = from i in Connections.list where i.LanIp == row[1] && i.WanIp == row[2] select i;
                     item = item.ToList();
-                    if(item.Count()<=0)
+                    if (item.Count() <= 0)
                     {
-                        Connections.list.Add(new Connection(row[1], row[2], Convert.ToInt32(row[0]), Convert.ToInt32(row[3]), Convert.ToBoolean(Convert.ToInt32(row[4])),behaviour));
+                        Connections.list.Add(new Connection(row[1], row[2], Convert.ToInt32(row[0]), Convert.ToInt32(row[3]), Convert.ToBoolean(Convert.ToInt32(row[4])), behaviour));
                     }
                     else
                     {
                         item.First().AddConn(Convert.ToInt32(row[0]), Convert.ToInt32(row[3]));
                     }
                 }
-                catch (ArgumentNullException) {
+                catch (ArgumentNullException)
+                {
                 }
             }
 
-        readFile.Close();
-        Console.ForegroundColor = ConsoleColor.White;
+            readFile.Close();
+            Console.ForegroundColor = ConsoleColor.White;
 
         }
 
@@ -392,11 +393,11 @@ namespace AleidaConsole
                     }
                 }
             }
-            catch(IOException)
+            catch (IOException)
             {
                 Console.WriteLine("The process cannot access the file 'ClearIPs.csv' because its being used by another process");
             }
-        return true;
+            return true;
         }
     }
 

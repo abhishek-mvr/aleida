@@ -20,7 +20,7 @@ namespace Aleida1.Controllers
             var lines = System.IO.File.ReadLines("SuspectedIPs.csv");
             foreach (var line in lines)
             {
-                if(line.Equals(ip))
+                if (line.Equals(ip))
                 {
                     return true;
                 }
