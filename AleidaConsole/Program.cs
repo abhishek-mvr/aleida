@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.IO;
+using System.Data.SqlClient;
 
 namespace AleidaConsole
 {
@@ -25,6 +26,7 @@ namespace AleidaConsole
     //Class for info on each connections
     public class Connection
     {
+        BehaviourLayer behaviour;
         public string LanIp { get; set; }
         public string WanIp { get; set; }
         public int Start { get; set; }
@@ -32,11 +34,12 @@ namespace AleidaConsole
         public bool Failure { get; set; }
         public int[] ActHours = new int[24];
         public List<int> Ports= new List<int>();
-        public Connection(string lanip, string wanip, int time, int port , bool failure)
+        public Connection(string lanip, string wanip, int time, int port , bool failure,BehaviourLayer behaviour)
         {
+            this.behaviour = behaviour;
             LanIP ip = new LanIP(lanip);
-            if (!LanIPs.list.Contains(ip))
-                 LanIPs.list.Add(ip);
+            if (!behaviour.list.Contains(ip))
+                behaviour.list.Add(ip);
             this.LanIp = lanip;
             this.WanIp = wanip;
             this.Start = time;
@@ -60,13 +63,26 @@ namespace AleidaConsole
 
     }
 
-    public static class LanIPs
+    public class BehaviourLayer
     {
-        public static List<LanIP> list = new List<LanIP>();
+        public List<LanIP> list = new List<LanIP>();
+        public string csv;
+        public void WriteCSV()
+        {
+            csv= String.Join("\n", list.Select(x => x.ToString()).ToArray());
+            Console.Write(csv);
+            System.IO.File.WriteAllText(@"behaviour.csv", csv);
+
+        }
     }
 
     public class LanIP
     {
+        public override string ToString()
+        {
+            return ip + ",." + random.Next() + ",." + random.Next() + ",." + random.Next();
+        }
+        Random random = new Random();
         int[] ah;
         List<int> ActiveHours = new List<int>();
         List<float> ar = new List<float>();
@@ -74,6 +90,7 @@ namespace AleidaConsole
         int end;
         int start;
         int Null;
+        public float ActB, FailB, ScanB;
 
         public LanIP(string ip)
         {
@@ -85,7 +102,7 @@ namespace AleidaConsole
             get
             {
                 var x = from conn in Connections.list where conn.LanIp == ip select conn.ActHours.Sum();
-                float y = x.Max();
+                float y = x.Max();  
                 return y;
             }
         }
@@ -101,7 +118,7 @@ namespace AleidaConsole
                 var ilist = jconn.Select(x => x.ActHours);
                 end = iend.Max();
                 start = istart.Min();
-                var jStart = jconn.GroupBy(y => y.WanIp).Select(g => g.Min(b=>b.Start));
+                var jStart = jconn.GroupBy(y => y.WanIp).Select(g => g.Min(b => b.Start));
                 Null = 0;
                 int[] arr = Enumerable.Repeat(1, 24).ToArray();
                 ActiveHours = new List<int>();
@@ -109,11 +126,11 @@ namespace AleidaConsole
                 {
                     ah = new int[24];
                     int i = start;
-                    while(i<end)
+                    while (i < end)
                     {
-                        if(conn[i]!=0)
+                        if (conn[i] != 0)
                         {
-                            ah[i]=1;
+                            ah[i] = 1;
                             arr[i] = 0;
                         }
                         i++;
@@ -122,17 +139,107 @@ namespace AleidaConsole
                 }
                 Null = arr.Sum();
                 t = 0;
-                foreach(var start in jStart)
+                foreach (var start in jStart)
                 {
                     try
                     {
-                    ar.Add(ActiveHours[t] / (((end - start) + 1) - Null));
+                        ar.Add(ActiveHours[t] / (((end - start) + 1) - Null));
                     }
-                    catch(DivideByZeroException)
-                    {}
+                    catch (DivideByZeroException)
+                    { }
                     t++;
                 }
                 return ar.Min();
+            }
+        }
+
+        public float ActWeight
+        {
+            get
+            {
+
+                return random.Next();
+            }
+        }
+        public float FailHour
+        {
+            get
+            {
+                return random.Next();
+            }
+        }
+
+        public float FailRate
+        {
+            get
+            {
+                return random.Next();
+            }
+        }
+        public float FailWeight
+        {
+            get
+            {
+                return random.Next();
+            }
+        }
+
+        public float FailFlow
+        {
+            get
+            {
+                return random.Next();
+            }
+        }
+
+        public float FailMatch
+        {
+            get
+            {
+                return random.Next();
+            }
+        }
+
+        public float NoExist
+        {
+            get
+            {
+                return random.Next();
+            }
+        }
+
+        public float DPortSum
+        {
+            get
+            {
+                return random.Next();
+            }
+        }
+
+        public float ActBehaviour
+        {
+            get
+            {
+                ActB = random.Next(0,1000);
+                return ActB;
+            }
+        }
+
+        public float FailBehaviour
+        {
+            get
+            {
+                FailB = random.Next(0,1000);
+                return FailB;
+            }
+        }
+
+        public float ScanBehaviour
+        {
+            get
+            {
+                ScanB = random.Next(0,1000);
+                return ScanB;
             }
         }
     }
@@ -140,22 +247,25 @@ namespace AleidaConsole
 
     static class Program
         {
+        public static int[] ActivityHours = new int[24];
+        public static BehaviourLayer behaviour;
         //Dictionary for all connection_info
 
         static void PrintCollections()
         {
             Console.WriteLine("Printing complete connections...");
-            foreach(var item in LanIPs.list)
+            foreach(var item in behaviour.list)
             {
-                Console.WriteLine(item.ip + " : "+item.ActRate + " : " +item.ActHour);
+                Console.WriteLine(item.ip + " : "+item.ActRate + " : " + item.ActHour + " : " + item.ActWeight + " : " + item.FailRate + " : " + item.FailMatch + " : " + item.FailHour + " : " + item.FailFlow);
             }
-            var x = LanIPs.list;
+            var x = behaviour.list;
             Console.WriteLine("Process Completed..");
 
         }
 
         static void Main()
         {
+            behaviour = new BehaviourLayer();
             Console.Write("Starting Aleida\n");
             using (var progress = new ProgressBar())
             { 
@@ -179,8 +289,44 @@ namespace AleidaConsole
             //    dPLayerItem = new DPLayerItem(item.Key);
             //    Console.WriteLine(dPLayerItem.con.lanip + " => " + dPLayerItem.con.swanip + " | " + dPLayerItem.ActHour());
             //}
+            behaviour.WriteCSV();
+            KMeans kmeans = new KMeans();
+            Console.WriteLine("No of elements to cluster"+ behaviour.list.Count());
+            foreach(var x in behaviour.list)
+            {
+                Console.WriteLine("item : "+x.ActBehaviour + " " + x.FailBehaviour + " " + x.ScanBehaviour);
+            }
+            kmeans.ClusterData(behaviour.list);
 
+            using (SqlConnection conn = new SqlConnection())
+            {
+                conn.ConnectionString = "Data Source=(localdb)\\ProjectsV13;Initial Catalog=DataServer;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+                conn.Open();
+                for(int i =0;i<24;i++)
+                {
+                    string cmd = "update Activity set activity="+ ActivityHours[i] + " where hour="+i;
+                    SqlCommand command = new SqlCommand(cmd, conn);
+
+                    Console.WriteLine(cmd);
+
+                    int count = command.ExecuteNonQuery();
+                    if (count > 0)
+                    //if (command.ExecuteReader().Read())
+                    {
+                        Console.Write("table updated :  ");
+                    }
+                    else
+                    {
+                        Console.WriteLine("no updation :  ");
+                    }
+
+
+                }
+
+            }
             Console.WriteLine("Done.");
+
+
 
         }
 
@@ -203,13 +349,15 @@ namespace AleidaConsole
                     Console.ForegroundColor = ConsoleColor.White;
                 Console.WriteLine(line);
 
+                ActivityHours[hour]++;
+
                 try
                 {
                     var item = from i in Connections.list where i.LanIp == row[1] && i.WanIp == row[2] select i;
                     item = item.ToList();
                     if(item.Count()<=0)
                     {
-                        Connections.list.Add(new Connection(row[1], row[2], Convert.ToInt32(row[0]), Convert.ToInt32(row[3]), Convert.ToBoolean(Convert.ToInt32(row[4]))));
+                        Connections.list.Add(new Connection(row[1], row[2], Convert.ToInt32(row[0]), Convert.ToInt32(row[3]), Convert.ToBoolean(Convert.ToInt32(row[4])),behaviour));
                     }
                     else
                     {

@@ -6,6 +6,7 @@ namespace Aleida1.Models
 {
     public partial class DataServerContext : DbContext
     {
+        public virtual DbSet<Activity> Activity { get; set; }
         public virtual DbSet<Pcdetails> Pcdetails { get; set; }
         public virtual DbSet<RawData> RawData { get; set; }
 
@@ -13,12 +14,25 @@ namespace Aleida1.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer(@"Data Source=(localdb)\ProjectsV13;Initial Catalog=DataServer;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
+                optionsBuilder.UseSqlServer(@"Server=(localdb)\ProjectsV13;Database=DataServer;Trusted_Connection=True;");
             }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Activity>(entity =>
+            {
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.Activity1)
+                    .HasColumnName("activity")
+                    .HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.Hour)
+                    .HasColumnName("hour")
+                    .HasDefaultValueSql("((0))");
+            });
+
             modelBuilder.Entity<Pcdetails>(entity =>
             {
                 entity.ToTable("PCDetails");
