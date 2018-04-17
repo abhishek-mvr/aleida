@@ -106,10 +106,6 @@ namespace Aleida1.Controllers
             if (model.Name != Name)
             {
                 var setNameResult = await _userManager.SetPhoneNumberAsync(user, model.PhoneNumber);
-                if (!setPhoneResult.Succeeded)
-                {
-                    throw new ApplicationException($"Unexpected error occurred setting phone number for user with ID '{user.Id}'.");
-                }
             }
 
             StatusMessage = "Your profile has been updated";
