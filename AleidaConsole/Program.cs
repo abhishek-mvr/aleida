@@ -60,8 +60,23 @@ namespace AleidaConsole
             if (!Ports.Contains(port))
                 Ports.Add(port);
         }
+    //Class for each ip connections
+    //public class Connection
+    //{
+    //    public String lanip;
+    //    public String swanip;
+    //    public Connection(String lanip, String swanip)
+    //    {
+    //        this.lanip = lanip;
+    //        this.swanip = swanip;
+    //    }
+            
+    //    public override string ToString()
+    //    {
+    //        return lanip + " " + swanip;
+    //    }
 
-    }
+    //}
 
     public class BehaviourLayer
     {
@@ -215,6 +230,10 @@ namespace AleidaConsole
                 return random.Next();
             }
         }
+    static class Program
+    {
+        //Dictionary for all connection_info
+        static Dictionary<string, List<ConnectionInfo>> Connections;
 
         public float ActBehaviour
         {
@@ -233,6 +252,15 @@ namespace AleidaConsole
                 return FailB;
             }
         }
+            public string connection, lanip;
+            //public float ActHour(string iconnection)
+            //{
+            //    connection = iconnection;
+            //    lanip = ExtractIP(connection)[0];
+            //    var xconn = from conn in Connections where ExtractIP(conn.Key)[0] == lanip select conn;
+            //    return xconn.Max(x=>x.Value.acthours.Sum());
+            //}
+                //, ActRate, ActWeight, FailHour, FailRate, FailWeight, FailFlow, FailMatch, NoExist, DPortSum;
 
         public float ScanBehaviour
         {
@@ -266,6 +294,7 @@ namespace AleidaConsole
         static void Main()
         {
             behaviour = new BehaviourLayer();
+            Connections = new Dictionary<string, List<ConnectionInfo>>();
             Console.Write("Starting Aleida\n");
             using (var progress = new ProgressBar())
             { 
@@ -334,6 +363,9 @@ namespace AleidaConsole
 
         private static void ReadRawData()
         {
+//            Connection ikey;
+            string key;
+            List<ConnectionInfo> value;
             int hour;
             StreamReader readFile = new StreamReader("RawData.csv");
             string line;
@@ -365,6 +397,23 @@ namespace AleidaConsole
                     }
                 }
                 catch (ArgumentNullException) {
+                    Connections[key].Add(new ConnectionInfo
+                    {
+                        start = Convert.ToInt32(row[0]),
+                        port = Convert.ToInt32(row[3]),
+                        failure = Convert.ToBoolean(Convert.ToInt32(row[4]))
+                    });
+                }
+                else
+                {
+                    value = new List<ConnectionInfo>();
+                    value.Add(new ConnectionInfo
+                    {
+                        start = Convert.ToInt32(row[0]),
+                        port = Convert.ToInt32(row[3]),
+                        failure = Convert.ToBoolean(Convert.ToInt32(row[4]))
+                    });
+                    Connections.Add(key, value);
                 }
             }
 

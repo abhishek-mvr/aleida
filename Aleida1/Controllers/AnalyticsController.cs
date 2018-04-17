@@ -14,19 +14,6 @@ namespace Aleida1.Controllers
     public class AnalyticsController : Controller
     {
         private DataServerContext ds = new DataServerContext();
-        //Check whether the ip is suspected or not from SuspectedIPs.csv file
-        bool IsSuspected(IPAddress ip)
-        {
-            var lines = System.IO.File.ReadLines("SuspectedIPs.csv");
-            foreach (var line in lines)
-            {
-                if(line.Equals(ip))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
 
         [Authorize]
         public IActionResult Index()

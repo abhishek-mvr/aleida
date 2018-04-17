@@ -9,5 +9,8 @@ namespace Aleida1.Models
     // Add profile data for application users by adding properties to the ApplicationUser class
     public class ApplicationUser : IdentityUser
     {
+        private string name;
+
+        public string Name { get => name; set => name = value; }
     }
 }
