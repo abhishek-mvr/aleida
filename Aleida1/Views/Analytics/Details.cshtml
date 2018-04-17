@@ -2,9 +2,24 @@
 
 @{
     ViewData["Title"] = "Details";
+    string result = "success";
+    string message = " is safe";
 }
-
-<h1>Details</h1>
+<br />
+<br />
+    @if(Model.Affected==1)
+    {
+        result = "danger";
+        message = " is in danger";
+    }
+    <div class="alert alert-@result" role="alert">
+        <h1>
+            <b>
+                @Model.Name 
+            </b>
+            @message
+        </h1>
+    </div>
 
 <div>
     <h4>Pcdetails</h4>
@@ -22,13 +37,42 @@
         <dd>
             @Html.DisplayFor(model => model.IpAddress)
         </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Affected)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Affected)
-        </dd>
     </dl>
 </div>
 <div>
 </div>
+
+<br /><br /><br /><br />
+
+<h1>
+    Hourly Network Connections
+</h1>
+<!--
+-->
+<canvas id="bar-chart" width="800" height="280"></canvas>
+<br /><br /><br /><br /><br /><br />
+
+<script type="text/javascript">
+        // Bar chart
+        new Chart(document.getElementById("bar-chart"), {
+            type: 'bar',
+            data: {
+                labels: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"],
+                datasets: [
+                    {
+                        label: "Connections ",
+                        backgroundColor: "#3e95cd",
+                        data: @ViewData["str"] ,
+                    }
+                ]
+            },
+            options: {
+                legend: { display: false },
+                title: {
+                    display: true,
+                    text: 'Network Activity'
+                }
+            }
+        });
+
+</script>

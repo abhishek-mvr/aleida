@@ -31,6 +31,9 @@ namespace Aleida1.Models
                 entity.Property(e => e.Hour)
                     .HasColumnName("hour")
                     .HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.ip)
+                    .HasColumnName("ip");
             });
 
             modelBuilder.Entity<Pcdetails>(entity =>

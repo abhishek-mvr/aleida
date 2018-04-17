@@ -13,7 +13,6 @@ namespace Aleida1.Models.AccountViewModels
         [Display(Name = "Email")]
         public string Email { get; set; }
 
-        [Required]
         [Display(Name = "Name")]
         public string Name { get; set; }
 

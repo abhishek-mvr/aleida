@@ -35,7 +35,7 @@ namespace Aleida1.Controllers
             int[] act = new int[24];
             foreach(var item in activity)
             {
-                act[Convert.ToInt32(item.Hour)] = Convert.ToInt32(item.Activity1);
+                act[Convert.ToInt32(item.Hour)]+= Convert.ToInt32(item.Activity1);
             }
             string str = "[";
             for(int i=0;i<23;i++)
@@ -52,6 +52,20 @@ namespace Aleida1.Controllers
         public IActionResult Details(int id = 1)
         {
             Pcdetails pc = ds.Pcdetails.Find(id);
+            var activity = from item in ds.Activity where item.ip==pc.IpAddress select item;
+            //            var activity = ds.Activity.ToList();
+            int[] act = new int[24];
+            foreach (var item in activity)
+            {
+                act[Convert.ToInt32(item.Hour)] += Convert.ToInt32(item.Activity1);
+            }
+            string str = "[";
+            for (int i = 0; i < 23; i++)
+            {
+                str = str + act[i] * 2 + ",";
+            }
+            str = str + act[23] * 2 + "]";
+            ViewData["str"] = str;
             return View(pc);
         }
 

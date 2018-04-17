@@ -8,5 +8,6 @@ namespace Aleida1.Models
         public int Id { get; set; }
         public int? Hour { get; set; }
         public int? Activity1 { get; set; }
+        public string ip { get; set; }
     }
 }

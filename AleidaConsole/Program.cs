@@ -149,7 +149,12 @@ namespace AleidaConsole
                     { }
                     t++;
                 }
-                return ar.Min();
+                if (ar.Capacity > 0)
+                {
+                    return ar.Min();
+                }
+                else
+                    return 0;
             }
         }
 
@@ -158,14 +163,14 @@ namespace AleidaConsole
             get
             {
 
-                return random.Next();
+                return 1;
             }
         }
         public float FailHour
         {
             get
             {
-                return random.Next();
+                return 1;
             }
         }
 
@@ -173,14 +178,14 @@ namespace AleidaConsole
         {
             get
             {
-                return random.Next();
+                return 1;
             }
         }
         public float FailWeight
         {
             get
             {
-                return random.Next();
+                return 1;
             }
         }
 
@@ -188,7 +193,7 @@ namespace AleidaConsole
         {
             get
             {
-                return random.Next();
+                return 1;
             }
         }
 
@@ -196,7 +201,7 @@ namespace AleidaConsole
         {
             get
             {
-                return random.Next();
+                return 1;
             }
         }
 
@@ -204,7 +209,7 @@ namespace AleidaConsole
         {
             get
             {
-                return random.Next();
+                return 2;
             }
         }
 
@@ -212,7 +217,7 @@ namespace AleidaConsole
         {
             get
             {
-                return random.Next();
+                return 2;
             }
         }
 
@@ -220,7 +225,7 @@ namespace AleidaConsole
         {
             get
             {
-                ActB = random.Next(0, 1000);
+                ActB = ActHour + ActRate + ActWeight;
                 return ActB;
             }
         }
@@ -229,7 +234,7 @@ namespace AleidaConsole
         {
             get
             {
-                FailB = random.Next(0, 1000);
+                float FailB = FailFlow + FailHour + FailMatch + FailRate + FailWeight;
                 return FailB;
             }
         }
@@ -238,16 +243,20 @@ namespace AleidaConsole
         {
             get
             {
-                ScanB = random.Next(0, 1000);
+                float ScanB = DPortSum + NoExist;
                 return ScanB;
             }
         }
     }
 
-
+    class Hours
+    {
+        public int[] amount = new int[24];
+        public List<string> wanips = new List<string>();
+    }
     static class Program
     {
-        public static int[] ActivityHours = new int[24];
+        public static Dictionary<string,Hours> activityHours = new Dictionary<string, Hours>(24);
         public static BehaviourLayer behaviour;
         //Dictionary for all connection_info
 
@@ -302,10 +311,17 @@ namespace AleidaConsole
             {
                 conn.ConnectionString = "Data Source=(localdb)\\ProjectsV13;Initial Catalog=DataServer;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
                 conn.Open();
-                for (int i = 0; i < 24; i++)
+//                int k = 0;
+                foreach(var item in activityHours)
                 {
-                    string cmd = "update Activity set activity=" + ActivityHours[i] + " where hour=" + i;
-                    SqlCommand command = new SqlCommand(cmd, conn);
+                    //  Add suspicious connection lists to DB
+                    //  string cmd2 = "insert into ConnectionsList values(" + item.Key + "," + item.Value.wanips + ")";
+                    
+                    for(int i=0;i<24;i++)
+                    {
+                        //string cmd = "insert into Activity values(" + k++ + "," + i + "," + item.Value.amount[i] + ",'" + item.Key + "')";
+                        string cmd = "update Activity set activity=" + item.Value.amount[i] + " where hour=" + i + " and ip ='" + item.Key + "'";
+                        SqlCommand command = new SqlCommand(cmd, conn);
 
                     Console.WriteLine(cmd);
 
@@ -318,6 +334,8 @@ namespace AleidaConsole
                     else
                     {
                         Console.WriteLine("no updation :  ");
+                    }
+
                     }
 
 
@@ -344,12 +362,33 @@ namespace AleidaConsole
                 hour = Convert.ToInt32(row[0]);
 
                 if (IsSuspected(row[2]))
+                {
                     Console.ForegroundColor = ConsoleColor.DarkRed;
+                    Console.WriteLine(line);
+                }
                 else
+                {
                     Console.ForegroundColor = ConsoleColor.White;
-                Console.WriteLine(line);
+                    Console.WriteLine(line);
+                    continue;
+                }
+                    
 
-                ActivityHours[hour]++;
+                //increment activity for that ip on that hour for the sake of graph
+                if(activityHours.ContainsKey(row[1]))
+                {
+                    if(!activityHours[row[1]].wanips.Contains(row[2]))
+                    {
+                        activityHours[row[1]].wanips.Add(row[2]);
+                    }
+                    activityHours[row[1]].amount[Convert.ToInt32(row[0])]++;
+                }
+                else
+                {
+                    Hours hours = new Hours();
+                    hours.amount[Convert.ToInt32(row[0])] = 1;
+                    activityHours.Add(row[1],hours);
+                }
 
                 try
                 {
