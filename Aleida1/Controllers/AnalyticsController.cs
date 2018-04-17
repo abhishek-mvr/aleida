@@ -31,6 +31,7 @@ namespace Aleida1.Controllers
         [Authorize]
         public IActionResult Index()
         {
+            string str = "";
             Console.WriteLine("Index method in Analytics");
             return View(ds.Pcdetails.ToList());
         }
