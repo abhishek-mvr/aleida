@@ -1,7 +1,85 @@
 ﻿@{
-    ViewBag.Title = "Home Page";
+    ViewBag.Title = "Help";
 }
-
+<br /><br />
+<div class="jumbotron">
 <h1>
-    This is Help page. The one you are looking is under construction.
+    How to remove malware from your Windows PC
 </h1>
+
+<p>
+    Beware the signs of a potentially malware-infested PC: slower-than-usual performance, the recent occurrence of lots of pop-ups, and other weird issues. It’s possible your system has been infected by a virus, spyware, or other nefarious entity—even if you have an antivirus program installed. Yes, out-of-the-ordinary behavior is sometimes the result of hardware issues, but it’s best to first rule out malware if your PC is acting up. Here’s a step-by-step guide for taking action.<br /><br />
+</p>
+</div>
+
+<h3>
+    <strong>
+        Step 1: Enter Safe Mode
+    </strong>
+</h3>
+
+<p>
+    Before you do anything, you need to disconnect your PC from the internet, and don’t use it until you’re ready to clean your PC. This can help prevent the malware from spreading and/or leaking your private data.<br />
+    If you think your PC may have a malware infection, boot your PC into Microsoft’s Safe Mode. In this mode, only the minimum required programs and services are loaded. If any malware is set to load automatically when Windows starts, entering in this mode may prevent it from doing so. This is important because it can make removing the nefarious files easier since they’re not actually running or active. <br />
+    Sadly, Microsoft has turned the process of booting into safe mode from a relatively easy process in Windows 7 and Windows 8 to one that is decidedly more complicated in Windows 10. To boot into Windows Safe Mode, first click the Start button in Windows 10 and select the Power button as if you were going to reboot, but don’t click anything. Next hold down the Shift key and click Reboot. When the full-screen menu appears, select Troubleshooting, then Advanced Options, then Startup Settings. On the next window click the Restart button and wait for the next screen to appear (just stick with us here, we know this is long). Next you will see a menu with numbered startup options; select number 4, which is Safe Mode. Note that if you want to connect to any online scanners you’ll need to select option 5, which is Safe Mode with Networking. <br />
+    You may find that your PC runs noticeably faster in Safe Mode. This could be a sign that your system has a malware infection, or it could mean that you have a lot of legitimate programs that normally start up alongside Windows. If your PC is outfitted with a solid-state drive it’s probably fast either way.
+</p>
+
+<h3>
+    <strong>
+        Step 2: Delete temporary files
+    </strong>
+</h3>
+
+<p>
+    Now that you’re in Safe Mode, you’ll want to run a virus scan. But before you do that, delete your temporary files. Doing this may speed up the virus scanning, free up disk space, and even get rid of some malware. To use the Disk Cleanup utility included with Windows 10 just type Disk Cleanup in the search bar or after pressing the Start button and select the tool that appears named Disk Cleanup.<br />
+</p>
+
+<h3>
+    <strong>
+        Step 3: Download malware scanners and run a scan
+    </strong>
+</h3>
+
+<p>
+    Now you’re ready to have a malware scanner do its work—and fortunately, running a scanner is enough to remove most standard infections. If you already had an antivirus program active on your computer, you should use a different scanner for this malware check, since your current antivirus software may not have detected the malware. Remember, no antivirus program can detect 100 percent of the millions of malware types and variants.<br />
+    There are two types of antivirus programs. You’re probably more familiar with real-time antivirus programs, which run in the background and constantly watch for malware. (Another option is an on-demand scanner, which searches for malware infections when you open the program manually and run a scan. You should have only one real-time antivirus program installed at a time, but you can have many on-demand scanners installed to run scans with multiple programs, thereby ensuring that if one program misses something a different one might find it.<br />
+    If you think your PC is infected, we recommend using an on-demand scanner first and then following up with a full scan by your real-time antivirus program. Among the free (and high-quality) on-demand scanners available are BitDefender Free Edition, Kaspersky Virus Removal Tool, Malwarebytes, Microsoft’s Malicious Software Removal Tool, Avast, and SuperAntiSpyware.<br />
+</p>
+
+<h3>
+    <strong>
+        Step 4: Fix your web browser
+    </strong>
+</h3>
+
+<p>
+    Malware infections can damage Windows system files and other settings. One common malware trait is to modify your web browser’s homepage to reinfect the PC, display advertisements, prevent browsing, and generally annoy you.<br />
+    Before launching your web browser, check your homepage and connection settings. For Internet Explorer right-click the Windows 10 Start button and select Control Panel, then Internet Options. Find the Home Page settings in the General tab, and verify that it’s not some site you know nothing about. For Chrome, Firefox, or Edge, simply go to the setttings window of your browser to check your homepage setting.<br />
+</p>
+
+<h3>
+    <strong>
+        Step 5: Recover your files if Windows is corrupt
+    </strong>
+</h3>
+
+<p>
+    If you can’t seem to remove the malware or if Windows isn’t working properly, you may have to reinstall Windows. But before wiping your hard drive, copy all of your files to an external USB or flash drive. If you check your email with a client program (such as Outlook or Windows Mail), make sure you export your settings and messages to save them. You should also back up your device drivers with a utility such as Double Driver, in case you don’t have the driver discs anymore or don’t want to download them all again. Remember, you can’t save installed programs. Instead, you’ll have to reinstall the programs from discs or redownload them.<br />
+    If Windows won’t start or work well enough to permit you to back up your files, you may create and use a Live CD, such as Hiren’s BootCD (HBCD), to access your files.<br />
+    Once you have backed up everything, reinstall Windows either from the disc that came with your PC, by downloading the installation image from Microsoft, or by using your PC’s factory restore option, if it has one. For a factory restore you typically must press a certain key on the keyboard during the boot process in order for restore procedure to initialize, and your PC should tell you what key to press in the first few seconds after you turn it on. It there’s no on-screen instructions consult your manual, the manufacturer, or Google. <br />
+</p>
+
+<h3>
+    <strong>
+        Keep your PC clean
+    </strong>
+</h3>
+
+<p>
+    Always make sure that you have a real-time antivirus program running on your PC, and make sure this program is always up-to-date. If you don’t want to spend money on yearly subscriptions, you can choose one of the many free programs that provide adequate protection, such as Avira Antivirus Free Edition and Bitdefender Antivirus Free Edition. If you’d prefer a more robust AV program, we recommend Norton Security Premium—see our roundup of the best antivirus software for more information. <br/>
+    In addition to installing traditional antivirus software, you might consider using the free OpenDNS service to help block dangerous sites. And if you frequent shady sites that might infect your PC with malware, consider running your web browser in sandbox mode to prevent any downloaded malware from harming your system. Some antivirus programs, such as Comodo, offer sandboxing features, or you can obtain them through a free third-party program such as Sandboxie.<br />
+    When you think that you’ve rid your PC of malware infections, double-check your online accounts, including those for your bank, email, and social networking sites. Look for suspicious activity and change your passwords—because some malware can capture your passwords.<br />
+    If you have a backup system in place that automatically backs up your files or system, consider running virus scans on the backups to confirm that they didn’t inadvertently save infections. If virus scans aren’t feasible, as is the case with online systems since they usually will only scan a drive attached to your PC or just the C:\ drive, consider deleting your old backups and resetting the software to begin saving new backups that are hopefully free from infections. <br />
+</p>
+
