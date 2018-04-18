@@ -4,13 +4,15 @@
     ViewData["Title"] = "Details";
     string result = "success";
     string message = " is safe";
+    string color = "#3e95cd";
 }
 <br />
 <br />
-    @if(Model.Affected==1)
+    @if (Model.Affected==1)
     {
         result = "danger";
         message = " is in danger";
+        color = "#dd2518";
     }
     <div class="alert alert-@result" role="alert">
         <h1>
@@ -61,7 +63,7 @@
                 datasets: [
                     {
                         label: "Connections ",
-                        backgroundColor: "#3e95cd",
+                        backgroundColor: "@color",
                         data: @ViewData["str"] ,
                     }
                 ]
@@ -76,3 +78,13 @@
         });
 
 </script>
+
+<h3>
+    <strong>
+        Suspected connections by @Model.Name
+    </strong>
+</h3>
+
+@Html.Raw(ViewBag.list)
+
+<br/><br/>

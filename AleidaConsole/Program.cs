@@ -309,6 +309,10 @@ namespace AleidaConsole
 
             using (SqlConnection conn = new SqlConnection())
             {
+                string cmd;
+                SqlCommand command;
+                int count;
+
                 conn.ConnectionString = "Data Source=(localdb)\\ProjectsV13;Initial Catalog=DataServer;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
                 conn.Open();
 //                int k = 0;
@@ -320,12 +324,12 @@ namespace AleidaConsole
                     for(int i=0;i<24;i++)
                     {
                         //string cmd = "insert into Activity values(" + k++ + "," + i + "," + item.Value.amount[i] + ",'" + item.Key + "')";
-                        string cmd = "update Activity set activity=" + item.Value.amount[i] + " where hour=" + i + " and ip ='" + item.Key + "'";
-                        SqlCommand command = new SqlCommand(cmd, conn);
+                         cmd = "update Activity set activity=" + item.Value.amount[i] + " where hour=" + i + " and ip ='" + item.Key + "'";
+                        command = new SqlCommand(cmd, conn);
 
                     Console.WriteLine(cmd);
 
-                    int count = command.ExecuteNonQuery();
+                    count = command.ExecuteNonQuery();
                     if (count > 0)
                     //if (command.ExecuteReader().Read())
                     {
@@ -337,9 +341,27 @@ namespace AleidaConsole
                     }
 
                     }
-
+                    foreach(var x in item.Value.wanips)
+                    {
+                        cmd = "select * from WanIP where lanip='" + item.Key + "' and wanip='" + x + "'";
+                    command = new SqlCommand(cmd, conn);
+                    count = command.ExecuteNonQuery();
+                    if (count > 0)
+                    //if (command.ExecuteReader().Read())
+                    {
+                            //                        Console.Write("Already exists");
+                        }
+                        else
+                    {
+//                        Console.WriteLine("Does not exists. needs insertion");
+                        cmd = "insert into WanIP values('" + item.Key + "','" + x + "')";
+                        command = new SqlCommand(cmd, conn);
+                        count = command.ExecuteNonQuery();
+                    }
+                    }
 
                 }
+
 
             }
             Console.WriteLine("Done.");
@@ -387,6 +409,7 @@ namespace AleidaConsole
                 {
                     Hours hours = new Hours();
                     hours.amount[Convert.ToInt32(row[0])] = 1;
+                    hours.wanips.Add(row[2]);
                     activityHours.Add(row[1],hours);
                 }
 

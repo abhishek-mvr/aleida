@@ -9,6 +9,7 @@ namespace Aleida1.Models
         public virtual DbSet<Activity> Activity { get; set; }
         public virtual DbSet<Pcdetails> Pcdetails { get; set; }
         public virtual DbSet<RawData> RawData { get; set; }
+        public virtual DbSet<Wanip> WanIP { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -45,6 +46,17 @@ namespace Aleida1.Models
                 entity.Property(e => e.IpAddress).HasColumnType("nchar(20)");
 
                 entity.Property(e => e.Name).HasColumnType("nchar(20)");
+            });
+
+            modelBuilder.Entity<Wanip>(entity =>
+            {
+                entity.ToTable("WanIP");
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.lanip).HasColumnType("nchar(50)");
+
+                entity.Property(e => e.wanip).HasColumnType("nchar(50)");
             });
 
             modelBuilder.Entity<RawData>(entity =>

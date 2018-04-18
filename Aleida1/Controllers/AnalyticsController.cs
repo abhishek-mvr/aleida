@@ -51,7 +51,23 @@ namespace Aleida1.Controllers
         [Authorize]
         public IActionResult Details(int id = 1)
         {
+            IPHostEntry entry; 
             Pcdetails pc = ds.Pcdetails.Find(id);
+            var x = from item in ds.WanIP where item.lanip == pc.IpAddress select item;
+            string list = "";
+            foreach (var item in x)
+            {
+                try
+                {
+                entry = Dns.GetHostEntry(item.wanip);
+                list += $"<li>{entry.HostName}</li>";
+                }
+                catch (Exception )
+                {
+                    list += $"<li>{item.wanip}</li>";
+                }
+            }
+            ViewBag.list = list;
             var activity = from item in ds.Activity where item.ip==pc.IpAddress select item;
             //            var activity = ds.Activity.ToList();
             int[] act = new int[24];
