@@ -162,8 +162,7 @@ namespace AleidaConsole
         {
             get
             {
-
-                return 1;
+                return 0;
             }
         }
         public float FailHour
